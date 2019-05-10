@@ -8,16 +8,16 @@ public class ClickExample : MonoBehaviour {
 
     [HideInInspector] public bool doRot = false;
 
-    private BasicController ctl;
+    //private BasicController ctl;
     private HoloLensHandTracking.HandsTrackingController handMgr;
 
     private void Awake() {
-        ctl = Camera.main.GetComponent<BasicController>();
+        //ctl = Camera.main.GetComponent<BasicController>();
         handMgr = GameObject.FindGameObjectWithTag("HandManager").GetComponent<HoloLensHandTracking.HandsTrackingController>();
     }
 
 	private void Update() {
-		if (ctl.isLookingAt == gameObject.name && handMgr.handPressed) {
+		if (handMgr.isLookingAt == gameObject.name && handMgr.handPressed) {
             doRot = true;
         }
 

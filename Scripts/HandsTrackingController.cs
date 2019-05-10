@@ -245,6 +245,41 @@ namespace HoloLensHandTracking
             handPressed = false;
         }
 
+        // ~ ~ ~ ~ ~ ~ ~ ~ 
+
+        [Header("Raycaster")]
+        public bool useRaycaster = true;
+        public bool debugRaycaster = true;
+
+        [HideInInspector] public bool isLooking = false;
+        [HideInInspector] public string isLookingAt = "";
+        [HideInInspector] public Vector3 lastHitPos = Vector3.one;
+
+        private float debugDrawTime = 0.3f;
+        private float debugRayScale = 100f;
+
+        private void rayUpdate() {
+            RaycastHit hit;
+            Ray ray;
+
+            ray = new Ray(lastPos, Camera.main.transform.forward);
+
+            if (Physics.Raycast(ray, out hit)) {
+                isLooking = true;
+                isLookingAt = hit.collider.name;
+
+                lastHitPos = hit.point;
+            } else {
+                isLooking = false;
+                isLookingAt = "";
+            }
+
+            if (debugRaycaster) {
+                Debug.DrawRay(lastPos, Camera.main.transform.forward * debugRayScale, Color.red, debugDrawTime, false);
+                Debug.Log("isLooking: " + isLooking + " isLookingAt: " + isLookingAt + " lastHitPos: " + lastHitPos);
+            }
+        }
+
     }
 
 }

@@ -24,6 +24,10 @@ namespace HoloLensHandTracking
         }
 
         public GameObject TrackingObject;
+        public Transform target;
+        public float smoothing = 0.5f;
+        public bool doSmoothing = true;
+
         public TextMesh StatusText;
         public Color DefaultColor = Color.green;
         public Color TapColor = Color.blue;
@@ -34,6 +38,7 @@ namespace HoloLensHandTracking
         [HideInInspector] public bool handPressed = false;
         [HideInInspector] public bool handUp = false;
         [HideInInspector] public Vector3 lastPos;
+        [HideInInspector] public Quaternion lastRot;
 
         private HashSet<uint> trackedHands = new HashSet<uint>();
         private Dictionary<uint, GameObject> trackingObject = new Dictionary<uint, GameObject>();
@@ -62,6 +67,16 @@ namespace HoloLensHandTracking
         {
             handDown = false;
             handUp = false;
+
+            try {
+                if (doSmoothing) {
+                    target.position = Vector3.Lerp(target.position, lastPos, smoothing);
+                    target.rotation = Quaternion.Lerp(target.rotation, lastRot, smoothing);
+                } else {
+                    target.position = lastPos;
+                    target.rotation = lastRot;
+                }
+            } catch (UnityException e) { }
         }
 
         private void ChangeObjectColor(GameObject obj, Color color)
@@ -162,6 +177,7 @@ namespace HoloLensHandTracking
                     if (args.state.sourcePose.TryGetRotation(out rot))
                     {
                         trackingObject[id].transform.rotation = rot;
+                        lastRot = rot;
                     }
                 }
             }
@@ -262,7 +278,7 @@ namespace HoloLensHandTracking
             RaycastHit hit;
             Ray ray;
 
-            ray = new Ray(lastPos, Camera.main.transform.forward);
+            ray = new Ray(target.position, target.forward);
 
             if (Physics.Raycast(ray, out hit)) {
                 isLooking = true;
@@ -275,7 +291,7 @@ namespace HoloLensHandTracking
             }
 
             if (debugRaycaster) {
-                Debug.DrawRay(lastPos, Camera.main.transform.forward * debugRayScale, Color.red, debugDrawTime, false);
+                Debug.DrawRay(target.position, target.forward * debugRayScale, Color.red, debugDrawTime, false);
                 Debug.Log("isLooking: " + isLooking + " isLookingAt: " + isLookingAt + " lastHitPos: " + lastHitPos);
             }
         }

@@ -77,6 +77,8 @@ namespace HoloLensHandTracking
                     target.rotation = lastRot;
                 }
             } catch (UnityException e) { }
+
+            if (useRaycaster) rayUpdate();
         }
 
         private void ChangeObjectColor(GameObject obj, Color color)
